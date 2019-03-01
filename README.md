@@ -1,6 +1,6 @@
-# antd-template
+# CheetahFnManager
 
-> A Vue.js project
+> A Cheetah project
 
 ## Build Setup
 

@@ -1,7 +1,7 @@
 {
-  "name": "antd-template",
+  "name": "cheetah-fn-manager",
   "version": "1.0.0",
-  "description": "A Vue.js project",
+  "description": "A Cheetah Project",
   "author": "Lienren <lienren@vip.qq.com>",
   "private": true,
   "scripts": {
