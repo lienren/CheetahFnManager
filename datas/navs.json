@@ -19,6 +19,10 @@
         "name": "角色管理"
       },
       {
+        "id": "/permissionlist",
+        "name": "权限接口管理"
+      },
+      {
         "id": "/menulist",
         "name": "菜单管理"
       },

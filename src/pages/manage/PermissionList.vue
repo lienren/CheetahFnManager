@@ -1,35 +1,30 @@
 <template>
   <div>
-    <h3>管理员列表</h3>
+    <h3>权限接口列表</h3>
     <iTable :toolbars="tableToolbars" :actionButtons="tableActionBtns" :columns="tableColumns" :dataSource="tableData" :pagination="tablePagination" :height="tableHeight" @on-change="handleTableChange"></iTable>
-    <a-modal title="新增管理员" v-model="createModalVisible" @ok="createModalAction" okText="保存" cancelText="取消">
+    <a-modal title="新增权限接口" v-model="createModalVisible" @ok="createModalAction" okText="保存" cancelText="取消">
       <a-form>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='登录名'>
-          <a-input placeholder='请输入登录名' v-model="info.loginName"></a-input>
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='权限名称'>
+          <a-input placeholder='请输入权限名称' v-model="info.name"></a-input>
         </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='登录密码'>
-          <a-input placeholder='请输入登录密码' v-model="info.loginPwd" type="password">
-          </a-input>
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='权限值'>
+          <a-input placeholder='请输入权限值' v-model="info.permission"></a-input>
         </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='真实姓名'>
-          <a-input placeholder='请输入真实姓名' v-model="info.fullName">
-          </a-input>
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='权限组'>
+          <a-input placeholder='请输入权限组' v-model="info.permissionGroup"></a-input>
         </a-form-item>
       </a-form>
     </a-modal>
-    <a-modal title="修改管理员密码" v-model="editPwdModalVisible" @ok="editPwdModalAction" okText="保存" cancelText="取消">
+    <a-modal title="修改权限接口" v-model="editModalVisible" @ok="editModalAction" okText="保存" cancelText="取消">
       <a-form>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='登录名'>
-          {{info.loginName}}
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='权限名称'>
+          <a-input placeholder='请输入权限名称' v-model="info.name"></a-input>
         </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='登录密码'>
-          {{info.fullName}}
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='权限值'>
+          <a-input placeholder='请输入权限值' v-model="info.permission"></a-input>
         </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='原密码'>
-          <a-input placeholder='请输入原密码' v-model="info.oldLoginPwd" type="password"></a-input>
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='新密码'>
-          <a-input placeholder='请输入新密码' v-model="info.newLoginPwd" type="password"></a-input>
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='权限组'>
+          <a-input placeholder='请输入权限组' v-model="info.permissionGroup"></a-input>
         </a-form-item>
       </a-form>
     </a-modal>
@@ -62,14 +57,12 @@ export default {
       tableToolbars: [],
       tableActionBtns: [],
       createModalVisible: false,
-      editPwdModalVisible: false,
+      editModalVisible: false,
       info: {
         id: 0,
-        loginName: '',
-        loginPwd: '',
-        fullName: '',
-        oldLoginPwd: '',
-        newLoginPwd: ''
+        name: '',
+        permission: '',
+        permissionGroup: ''
       }
     }
   },
@@ -124,12 +117,16 @@ export default {
           width: '10%'
         },
         {
-          title: '登录名',
+          title: '权限名称',
           dataIndex: 'name',
           width: '15%'
         }, {
-          title: '真实姓名',
-          dataIndex: 'fullName',
+          title: '权限值',
+          dataIndex: 'permission',
+          width: '20%'
+        }, {
+          title: '权限组',
+          dataIndex: 'permissionGroup',
           width: '20%'
         }, {
           title: '操作',
@@ -142,25 +139,16 @@ export default {
       this.tableActionBtns = [
         {
           model: 'button',
-          text: '设置角色',
-          purview: 'edit',
-          style: { color: '#ff6900' },
-          icon: 'edit',
-          click: (e) => {
-            this.$message.success('此功能还未开放！')
-          }
-        },
-        {
-          model: 'button',
-          text: '修改密码',
+          text: '修改',
           icon: 'edit',
           purview: 'edit',
           click: (e) => {
             this.info = {
               id: e.id,
-              loginName: e.name,
-              fullName: e.fullName }
-            this.editPwdModalVisible = true
+              name: e.name,
+              permission: e.permission,
+              permissionGroup: e.permissionGroup }
+            this.editModalVisible = true
           }
         },
         {
@@ -172,11 +160,11 @@ export default {
           confirm: {
             title: '确认要删除吗？',
             confirm: async (e) => {
-              let result = await api.delManagement({
-                adminID: e.id
+              let result = await api.delPermission({
+                permissionID: e.id
               })
               if (result) {
-                this.$message.success('管理员删除成功！')
+                this.$message.success('权限删除成功！')
                 this.fetch({
                   ...this.tablePagination
                 })
@@ -198,7 +186,7 @@ export default {
     },
     async fetch (param = {}) {
       this.tableData = []
-      let result = await api.getAllManagement(`?pageindex=${param.current}&pagesize=${param.pageSize}`)
+      let result = await api.getAllPermission(`?pageindex=${param.current}&pagesize=${param.pageSize}`)
       if (result) {
         result.data.forEach(item => {
           this.tableData.push({
@@ -220,71 +208,70 @@ export default {
       })
     },
     async createModalAction () {
-      if (this.info.loginName === '') {
-        this.$message.error('请填写帐号信息！')
+      if (this.info.name === '') {
+        this.$message.error('请填写权限名称！')
         return
       }
 
-      if (this.info.loginPwd === '') {
-        this.$message.error('请填写密码！')
+      if (this.info.permission === '') {
+        this.$message.error('请填写权限值！')
         return
       }
 
-      if (this.info.fullName === '') {
-        this.$message.error('请填写真实姓名！')
+      if (this.info.permissionGroup === '') {
+        this.$message.error('请填写权限组！')
         return
       }
 
-      let result = await api.createManagement({
-        'adminName': this.info.loginName,
-        'password': this.info.loginPwd,
-        'fullName': this.info.fullName
+      let result = await api.createPermission({
+        'permissionName': this.info.name,
+        'permission': this.info.permission,
+        'group': this.info.permissionGroup
       })
 
       if (result) {
-        this.$message.success('新增管理员成功！')
+        this.$message.success('新增权限成功！')
         this.createModalVisible = false
         this.info = {
           id: 0,
-          loginName: '',
-          loginPwd: '',
-          fullName: '',
-          oldLoginPwd: '',
-          newLoginPwd: '' }
+          name: '',
+          permission: '',
+          permissionGroup: '' }
         this.fetch({
           ...this.tablePagination
         })
       }
     },
-    async editPwdModalAction () {
-      if (this.info.oldLoginPwd === '') {
-        this.$message.error('请填写帐号原密码！')
+    async editModalAction () {
+      if (this.info.name === '') {
+        this.$message.error('请填写权限名称！')
         return
       }
 
-      if (this.info.newLoginPwd === '') {
-        this.$message.error('请填写帐号新密码！')
+      if (this.info.permission === '') {
+        this.$message.error('请填写权限值！')
         return
       }
 
-      let result = await api.editManagementPwd(
-        {
-          adminID: this.info.id,
-          old: this.info.oldLoginPwd,
-          new: this.info.newLoginPwd
-        }
-      )
+      if (this.info.permissionGroup === '') {
+        this.$message.error('请填写权限组！')
+        return
+      }
+
+      let result = await api.editPermission({
+        'permissionName': this.info.name,
+        'permission': this.info.permission,
+        'group': this.info.permissionGroup
+      })
 
       if (result) {
-        this.$message.success('密码修改成功！')
-        this.editPwdModalVisible = false
+        this.$message.success('权限修改成功！')
+        this.editModalVisible = false
         this.info = {
           id: 0,
-          loginName: '',
-          loginPwd: '',
-          fullName: '',
-          oldLoginPwd: '',
-          newLoginPwd: '' }
+          name: '',
+          permission: '',
+          permissionGroup: '' }
         this.fetch({
           ...this.tablePagination
         })

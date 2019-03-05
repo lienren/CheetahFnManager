@@ -10,11 +10,11 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/demoApi': {
-        target: 'http://super.51pinzhi.cn',
+      '/cheetah': {
+        target: 'http://132.232.11.254:20000/cheetah',
         changeOrigin: true,
         pathRewrite: {
-          '^/demoApi': ''
+          '^/cheetah': ''
         }
       },
       '/ueditor': {

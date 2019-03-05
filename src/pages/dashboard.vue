@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h3>您好，{{authInfo.userName}}</h3>
+    <h3>您好，{{authInfo.fullName}}</h3>
     <div>{{todayCalendar}} 农历{{lunarCalendar}}</div>
     <a-divider />
     <a-button type="primary" @click="addBadge">触发事件</a-button>

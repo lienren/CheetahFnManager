@@ -2,7 +2,7 @@
  * @Author: Lienren
  * @Date: 2018-08-13 22:30:45
  * @Last Modified by: Lienren
- * @Last Modified time: 2018-08-13 22:32:55
+ * @Last Modified time: 2019-03-05 13:46:50
  */
 'use strict'
 
@@ -17,7 +17,8 @@ export default {
     ) {
       console.log(`登录验证失败！${msg}`)
     } else {
-      console.log(`传输异常，请稍后再试！${msg}`)
+      // onsole.log(`传输异常，请稍后再试！`)
+      window.$globalHub.$message.error(`${msg}`)
     }
   }
 }

@@ -2,7 +2,7 @@
  * @Author: Lienren
  * @Date: 2018-08-19 10:08:52
  * @Last Modified by: Lienren
- * @Last Modified time: 2019-02-28 14:57:38
+ * @Last Modified time: 2019-03-05 17:51:31
  */
 'use strict'
 
@@ -48,6 +48,11 @@ export default [
         path: '/rolelist',
         name: '角色管理',
         component: view('manage/RoleList')
+      },
+      {
+        path: '/permissionlist',
+        name: '权限接口管理',
+        component: view('manage/PermissionList')
       },
       {
         path: '/menulist',

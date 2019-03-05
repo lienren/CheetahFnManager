@@ -1,12 +1,12 @@
 ﻿/*
  * @Author: Lienren
  * @Date: 2018-08-19 10:09:51
- * @Last Modified by:   Lienren
- * @Last Modified time: 2018-08-19 10:09:51
+ * @Last Modified by: Lienren
+ * @Last Modified time: 2019-03-05 11:03:09
  */
 'use strict'
 
-var chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+const chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 export default {
   getWidthHeight () {
     let w = window

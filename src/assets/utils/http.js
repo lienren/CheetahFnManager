@@ -2,7 +2,7 @@
  * @Author: Lienren
  * @Date: 2018-08-13 22:29:08
  * @Last Modified by: Lienren
- * @Last Modified time: 2018-08-13 23:19:11
+ * @Last Modified time: 2019-03-05 11:25:43
  */
 'use strict'
 
@@ -11,9 +11,9 @@ import ex from './httpex'
 import codes from './httpresultcode'
 
 // 通用接口业务成功判定条件
-const DEF_VALIDATOR = res => res.ErrorCode === codes.SUCCESS
+const DEF_VALIDATOR = res => res.code === codes.SUCCESS && res.data.code === codes.BSSUCCESS
 // 通用接口业务失败处理
-const DEF_FAIL_HANDLING = res => ex.ErrorMsg(res.ErrorCode, res.Message)
+const DEF_FAIL_HANDLING = res => ex.ErrorMsg(res.data.code, res.data.msg)
 
 function requestUrl (url) {
   return url
@@ -26,7 +26,7 @@ function send (url, method, body, options, load, loadMsg, validator, defFail, de
   if (load) {
     // 显示加载框
   }
-  let token = ''
+  let token = window.$globalHub.$store.state.auth.authInfo.token
   opts.headers = {
     Accept: 'application/json',
     'Content-Type': 'application/json',
@@ -42,7 +42,7 @@ function send (url, method, body, options, load, loadMsg, validator, defFail, de
       }
       // 验证接口结果
       if (validator(obj)) {
-        return obj
+        return obj.data
       } else {
         if (defFail) {
           // 通用业务失败处理
@@ -50,7 +50,7 @@ function send (url, method, body, options, load, loadMsg, validator, defFail, de
           return null
         } else {
           // 返回前台处理
-          return obj
+          return obj.data
         }
       }
     })

@@ -2,8 +2,9 @@
   <a-layout-sider :trigger="null" collapsible v-model="collapsed" :style="{ position: 'relative' }">
     <div class="logo">{{collapsed?shortLogoName:logoName}}
       <span>{{version}}</span>
+      <div :class="navSwitchClassName" :title="navSwitchText" @click="collapse"></div>
     </div>
-    <a-menu theme="dark" mode="inline" :defaultOpenKeys="defaultOpenKeys" :defaultSelectedKeys="defaultSelectedKeys" @select="select">
+    <a-menu theme="dark" mode="inline" :openKeys="openKeys" @openChange="onOpenChange" :defaultOpenKeys="defaultOpenKeys" :defaultSelectedKeys="defaultSelectedKeys" @select="select">
       <template v-for="nav in navs">
         <a-sub-menu v-if="nav.children&&nav.children.length>0" :key="nav.id">
           <span slot="title">
@@ -18,13 +19,11 @@
         </a-menu-item>
       </template>
     </a-menu>
-    <div class="trigger-list">
-      <a-icon class="trigger menu-collapsed-switch" :title="navSwitchText" :type="navSwitchClassName" @click="collapse" />
-    </div>
   </a-layout-sider>
 </template>
 
 <script>
+import { mapState } from 'vuex'
 
 export default {
   props: {
@@ -41,23 +40,20 @@ export default {
     },
     version: {
       type: String,
-      default: 'Beta1.0.0'
-    },
-    collapsed: {
-      type: Boolean,
-      default: false
+      default: 'V1.0'
     }
   },
   components: {},
   data () {
-    return {}
-  },
-  watch: {
-    collapsed (val) {
-      this.$emit('update:collapsed', val)
+    return {
+      openKeys: []
     }
   },
+  watch: {},
   computed: {
+    ...mapState({
+      collapsed: state => state.auth.collapsed
+    }),
     rountKey () {
       let path = window.location.href.split('/')
       return path && path.length > 0 ? `/${path[path.length - 1]}` : ''
@@ -81,7 +77,7 @@ export default {
       return this.collapsed ? '打开菜单' : '收起菜单'
     },
     navSwitchClassName () {
-      return this.collapsed ? 'menu-unfold' : 'menu-fold'
+      return this.collapsed ? 'collapsed unfold' : 'collapsed fold'
     }
   },
   created () { },
@@ -99,45 +95,29 @@ export default {
       })
     },
     collapse () {
-      this.$emit('update:collapsed', !this.collapsed)
+      // 设置登录信息
+      this.$store.commit('SET_COLLAPSED', !this.collapsed)
       this.$emit('on-collapse', this.collapsed)
     },
     select (selected) {
       this.$emit('on-select', selected)
+    },
+    onOpenChange (openKeys) {
+      const latestOpenKey = openKeys.find(key => this.openKeys.indexOf(key) === -1)
+      this.openKeys = latestOpenKey ? [latestOpenKey] : []
     }
   }
 }
 </script>
 
 <style lang="less" rel="stylesheet/less">
-  .trigger-list {
-    position: absolute;
-    width: 100%;
-    height: 38px;
-    bottom: 0;
-    background-color: #001529;
-    .trigger {
-      color: rgba(255, 255, 255, 0.65);
-      font-size: 18px;
-      cursor: pointer;
-      transition: color 0.3s;
-      &:hover {
-        color: #1890ff;
-      }
-      &.menu-collapsed-switch {
-        position: absolute;
-        left: 10px;
-        top: 10px;
-      }
-    }
-  }
-
   .logo {
     position: relative;
     height: 48px;
+    width: 100%;
     font-size: 18px;
     text-align: center;
-    margin: 8px 16px 0;
+    margin: 8px 0;
     color: #fff;
     overflow: hidden;
     span {
@@ -150,8 +130,48 @@ export default {
       border-radius: 20px;
       background: #f56c6c;
       color: #fff;
-      margin: 0px 0 0 -30px;
+      margin: 0 0 0 -16px;
       transform: scale(0.7);
+    }
+    .collapsed {
+      position: absolute;
+      height: 20px;
+      width: 10px;
+      right: 0;
+      top: 3px;
+      background-color: #000;
+      cursor: pointer;
+
+      &::after {
+        position: absolute;
+        content: '';
+        display: block;
+        width: 5px;
+        height: 5px;
+        top: 50%;
+        left: 50%;
+        margin-top: -2px;
+        border-right: 1px solid #ccc;
+        border-top: 1px solid #ccc;
+      }
+
+      &.fold::after {
+        transform: rotate(-135deg);
+        -ms-transform: rotate(-135deg);
+        -moz-transform: rotate(-135deg);
+        -webkit-transform: rotate(-135deg);
+        -o-transform: rotate(-135deg);
+        margin-left: -2px;
+      }
+
+      &.unfold::after {
+        transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        -moz-transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+        -o-transform: rotate(45deg);
+        margin-left: -3px;
+      }
     }
   }
 </style>

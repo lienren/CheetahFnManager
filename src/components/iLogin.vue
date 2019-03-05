@@ -4,29 +4,26 @@
       <div style="padding-top:20px;">
         <a-form>
           <a-form-item v-if="!loginButtonLoading">
-            <a-input placeholder="请填写登录手机号" size="large" v-model="userPhone">
-              <a-icon slot="prefix" type="phone" />
-              <a-icon v-if="userPhone" slot="suffix" type="close-circle" @click="userPhone=''" />
+            <a-input placeholder="请填写登录帐号" size="large" v-model="loginName">
+              <a-icon slot="prefix" type="credit-card" />
+              <a-icon v-if="loginName" slot="suffix" type="close-circle" @click="loginName=''" />
+            </a-input>
+          </a-form-item>
+          <a-form-item v-if="!loginButtonLoading">
+            <a-input placeholder="请填写登录密码" size="large" v-model="loginPwd" type="password">
+              <a-icon slot="prefix" type="lock" />
+              <a-icon v-if="loginPwd" slot="suffix" type="close-circle" @click="loginPwd=''" />
             </a-input>
           </a-form-item>
           <a-form-item v-if="!loginButtonLoading">
             <a-input-group compact>
-              <a-input style="width:65%" placeholder="请填写右侧图文验证码" size="large" v-model="imgCode">
+              <a-input style="width:65%" placeholder="请填写右侧图文验证码" maxlength="4" size="large" v-model="imgCode">
                 <a-icon slot="prefix" type="picture" />
                 <a-icon v-if="imgCode" slot="suffix" type="close-circle" @click="imgCode=''" />
               </a-input>
-              <a-button style="width:35%;" size="large">
-                <img src="http://poc.51pinzhi.cn/proxy/prodApi/poc/tool/VerifyImage?guid=0e04aad8-c36c-3151-066b-e0a4e9278aee" alt="">
+              <a-button style="width:35%;" size="large" @click="channgeVerificationCodeImg">
+                <img :src="imgBase64" alt="">
               </a-button>
-            </a-input-group>
-          </a-form-item>
-          <a-form-item v-if="!loginButtonLoading">
-            <a-input-group compact>
-              <a-input style="width:65%;" size="large" v-model="smsCode">
-                <a-icon slot="prefix" type="mail" />
-                <a-icon v-if="smsCode" slot="suffix" type="close-circle" @click="smsCode=''" />
-              </a-input>
-              <a-button style="width:35%;" size="large">发送验证码</a-button>
             </a-input-group>
           </a-form-item>
           <a-form-item>
@@ -42,15 +39,18 @@
 </template>
 
 <script>
+import api from '../api/cheetah'
 const dataNavs = require('../../datas/navs.json')
 
 export default {
   components: {},
   data () {
     return {
-      userPhone: '',
+      loginName: '',
+      loginPwd: '',
       imgCode: '',
-      smsCode: '',
+      imgCodeKey: '',
+      imgBase64: '',
       loginButtonLoading: false,
       loginButtonText: '登 录',
       loginButtonType: 'primary'
@@ -62,31 +62,72 @@ export default {
   mounted () {
     // 初始化登录信息
     // this.$store.commit('AUTH_INIT')
+    this.init()
   },
   methods: {
-    login () {
+    async init () {
+      this.channgeVerificationCodeImg()
+    },
+    async login () {
+      if (this.loginName === '') {
+        this.$message.error('请填写帐号信息！')
+        return
+      }
+
+      if (this.loginPwd === '') {
+        this.$message.error('请填写密码！')
+        return
+      }
+
+      if (this.imgCode === '') {
+        this.$message.error('请填写图文验证码！')
+        return
+      }
+
+      if (this.imgCodeKey === '') {
+        this.$message.error('请先获取图文验证码！')
+        return
+      }
+
       this.loginButtonLoading = true
       this.loginButtonText = '登录权限验证中，请稍后'
 
-      setTimeout(() => {
-        if (this.userPhone !== 'admin') {
-          this.loginButtonLoading = false
-          this.loginButtonText = '验证失败，请重新填写后再试一次'
-          this.loginButtonType = 'danger'
-        } else {
-          // 设置登录信息
-          window.$globalHub.$store.commit('SET_AUTH', {
-            userPhone: this.userPhone,
-            userName: '超级管理员',
-            imgCode: this.imgCode,
-            smsCode: this.smsCode
-          })
-          // 设置用户菜单信息
-          window.$globalHub.$store.commit('SET_NAV', dataNavs)
-          // 路由跳转
-          this.$router.push({ path: '/dashboard' })
-        }
-      }, 3000)
+      let result = await api.login({
+        'name': this.loginName,
+        'password': this.loginPwd,
+        'verificationKey': this.imgCodeKey,
+        'verificationCode': this.imgCode
+      }, {
+        defFail: false
+      })
+
+      if (result.code === 200) {
+        let tokenInfo = this.$utils.Jwt.getTokenInfo(result.data)
+        window.$globalHub.$store.commit('SET_AUTH', {
+          loginName: this.loginName,
+          // TODO: 需要更新成fullName数据
+          fullName: tokenInfo && tokenInfo.payload ? tokenInfo.payload.username : '未知',
+          token: result.data,
+          tokenInfo: tokenInfo
+        })
+
+        // 获取菜单列表
+        window.$globalHub.$store.commit('SET_NAV', dataNavs)
+        this.$router.push({ path: '/dashboard' })
+      } else {
+        this.loginButtonLoading = false
+        this.loginButtonText = '验证失败，请重新填写后再试一次'
+        this.loginButtonType = 'danger'
+        this.imgCode = ''
+        this.channgeVerificationCodeImg()
+      }
+    },
+    async channgeVerificationCodeImg () {
+      this.imgCodeKey = this.$utils.Common.generateMixed(32)
+      let result = await api.getVerificationCode({
+        key: this.imgCodeKey
+      })
+      this.imgBase64 = 'data:image/png;base64,' + result.data
     }
   }
 }
