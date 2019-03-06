@@ -2,7 +2,7 @@
  * @Author: Lienren
  * @Date: 2019-03-05 10:48:19
  * @Last Modified by: Lienren
- * @Last Modified time: 2019-03-05 18:37:54
+ * @Last Modified time: 2019-03-06 18:04:25
  */
 'use strict'
 
@@ -17,8 +17,8 @@ export default {
   login (body, op = {}) {
     return Vue.$utils.Http.post(`/cheetah/login`, { ...body }, op)
   },
-  getAllManagement (param, op = {}) {
-    return Vue.$utils.Http.get(`/cheetah/management/admin/getAll${param}`, op)
+  getAllManagement (body, op = {}) {
+    return Vue.$utils.Http.post(`/cheetah/management/admin/getAll`, {...body}, op)
   },
   createManagement (body, op = {}) {
     return Vue.$utils.Http.post(`/cheetah/management/admin/add`, { ...body }, op)
@@ -29,8 +29,14 @@ export default {
   delManagement (body, op = {}) {
     return Vue.$utils.Http.post(`/cheetah/management/admin/delete`, { ...body }, op)
   },
-  getAllRole (param, op = {}) {
-    return Vue.$utils.Http.get(`/cheetah/management/role/getAll${param}`, op)
+  editManagementRole (body, op = {}) {
+    return Vue.$utils.Http.post(`/cheetah/management/admin/addRole`, { ...body }, op)
+  },
+  getManagementRole (body, op = {}) {
+    return Vue.$utils.Http.post(`/cheetah/management/admin/getAdminRoles`, { ...body }, op)
+  },
+  getAllRole (body, op = {}) {
+    return Vue.$utils.Http.post(`/cheetah/management/role/getAll`, {...body}, op)
   },
   delRole (body, op = {}) {
     return Vue.$utils.Http.post(`/cheetah/management/role/delete`, { ...body }, op)
@@ -38,8 +44,8 @@ export default {
   createRole (body, op = {}) {
     return Vue.$utils.Http.post(`/cheetah/management/role/add`, { ...body }, op)
   },
-  getAllPermission (param, op = {}) {
-    return Vue.$utils.Http.get(`/cheetah/management/permission/getAll${param}`, op)
+  getAllPermission (body, op = {}) {
+    return Vue.$utils.Http.post(`/cheetah/management/permission/getAll`, {...body}, op)
   },
   delPermission (body, op = {}) {
     return Vue.$utils.Http.post(`/cheetah/management/permission/delete`, { ...body }, op)
@@ -49,5 +55,17 @@ export default {
   },
   editPermission (body, op = {}) {
     return Vue.$utils.Http.post(`/cheetah/management/permission/modify`, { ...body }, op)
+  },
+  getAllPage (body, op = {}) {
+    return Vue.$utils.Http.post(`/cheetah/management/page/getAll`, { ...body }, op)
+  },
+  createPage (body, op = {}) {
+    return Vue.$utils.Http.post(`/cheetah/management/page/add`, { ...body }, op)
+  },
+  editPage (body, op = {}) {
+    return Vue.$utils.Http.post(`/cheetah/management/page/modify`, { ...body }, op)
+  },
+  delPage (body, op = {}) {
+    return Vue.$utils.Http.post(`/cheetah/management/page/delete`, { ...body }, op)
   }
 }

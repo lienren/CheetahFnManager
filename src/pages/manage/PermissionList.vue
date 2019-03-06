@@ -2,55 +2,23 @@
   <div>
     <h3>权限接口列表</h3>
     <iTable :toolbars="tableToolbars" :actionButtons="tableActionBtns" :columns="tableColumns" :dataSource="tableData" :pagination="tablePagination" :height="tableHeight" @on-change="handleTableChange"></iTable>
-    <a-modal title="新增权限接口" v-model="createModalVisible" @ok="createModalAction" okText="保存" cancelText="取消">
-      <a-form>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='权限名称'>
-          <a-input placeholder='请输入权限名称' v-model="info.name"></a-input>
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='权限值'>
-          <a-input placeholder='请输入权限值' v-model="info.permission"></a-input>
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='权限组'>
-          <a-input placeholder='请输入权限组' v-model="info.permissionGroup"></a-input>
-        </a-form-item>
-      </a-form>
-    </a-modal>
-    <a-modal title="修改权限接口" v-model="editModalVisible" @ok="editModalAction" okText="保存" cancelText="取消">
-      <a-form>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='权限名称'>
-          <a-input placeholder='请输入权限名称' v-model="info.name"></a-input>
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='权限值'>
-          <a-input placeholder='请输入权限值' v-model="info.permission"></a-input>
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='权限组'>
-          <a-input placeholder='请输入权限组' v-model="info.permissionGroup"></a-input>
-        </a-form-item>
-      </a-form>
-    </a-modal>
+    <iFormBox title="新增权限接口" :items="createInfo" :isVisible.sync="createModalVisible" @on-action="createModalAction"></iFormBox>
+    <iFormBox title="修改权限接口" :items="editInfo" :isVisible.sync="editModalVisible" @on-action="editModalAction"></iFormBox>
   </div>
 </template>
 
 <script>
 
 import api from '../../api/cheetah'
-import { iTable } from '../../components/'
+import { iTable, iFormBox } from '../../components/'
 
 export default {
   components: {
-    iTable
+    iTable,
+    iFormBox
   },
   data () {
     return {
-      labelCol: {
-        span: 4
-      },
-      wrapperCol: {
-        span: 14
-      },
-      wrapperButtonCol: {
-        span: 14, offset: 4
-      },
       tableColumns: [],
       tableData: [],
       tablePagination: {},
@@ -58,12 +26,8 @@ export default {
       tableActionBtns: [],
       createModalVisible: false,
       editModalVisible: false,
-      info: {
-        id: 0,
-        name: '',
-        permission: '',
-        permissionGroup: ''
-      }
+      createInfo: {},
+      editInfo: {}
     }
   },
   computed: {
@@ -98,13 +62,7 @@ export default {
           icon: 'edit',
           text: '新增',
           click: () => {
-            this.info = {
-              id: 0,
-              loginName: '',
-              loginPwd: '',
-              fullName: '',
-              oldLoginPwd: '',
-              newLoginPwd: '' }
+            this.initInfo()
             this.createModalVisible = true
           }
         }
@@ -143,11 +101,10 @@ export default {
           icon: 'edit',
           purview: 'edit',
           click: (e) => {
-            this.info = {
-              id: e.id,
-              name: e.name,
-              permission: e.permission,
-              permissionGroup: e.permissionGroup }
+            this.editInfo.id.model = e.id
+            this.editInfo.name.model = e.name
+            this.editInfo.permission.model = e.permission
+            this.editInfo.permissionGroup.model = e.permissionGroup
             this.editModalVisible = true
           }
         },
@@ -183,10 +140,62 @@ export default {
       this.fetch({
         ...this.tablePagination
       })
+      this.initInfo()
+    },
+    initInfo () {
+      this.createInfo = {
+        id: {
+          model: 0
+        },
+        name: {
+          type: 'text',
+          label: '权限名称',
+          placeholder: '请输入权限名称',
+          model: ''
+        },
+        permission: {
+          type: 'text',
+          label: '权限值',
+          placeholder: '请输入权限值',
+          model: ''
+        },
+        permissionGroup: {
+          type: 'text',
+          label: '权限组',
+          placeholder: '请输入权限组',
+          model: ''
+        }
+      }
+      this.editInfo = {
+        id: {
+          model: 0
+        },
+        name: {
+          type: 'text',
+          label: '权限名称',
+          placeholder: '请输入权限名称',
+          model: ''
+        },
+        permission: {
+          type: 'text',
+          label: '权限值',
+          placeholder: '请输入权限值',
+          model: ''
+        },
+        permissionGroup: {
+          type: 'text',
+          label: '权限组',
+          placeholder: '请输入权限组',
+          model: ''
+        }
+      }
     },
     async fetch (param = {}) {
       this.tableData = []
-      let result = await api.getAllPermission(`?pageindex=${param.current}&pagesize=${param.pageSize}`)
+      let result = await api.getAllPermission({
+        pageindex: param.current,
+        pagesize: param.pageSize
+      })
       if (result) {
         result.data.forEach(item => {
           this.tableData.push({
@@ -207,71 +216,34 @@ export default {
         ...this.tablePagination
       })
     },
-    async createModalAction () {
-      if (this.info.name === '') {
-        this.$message.error('请填写权限名称！')
-        return
-      }
-
-      if (this.info.permission === '') {
-        this.$message.error('请填写权限值！')
-        return
-      }
-
-      if (this.info.permissionGroup === '') {
-        this.$message.error('请填写权限组！')
-        return
-      }
-
+    async createModalAction (items) {
       let result = await api.createPermission({
-        'permissionName': this.info.name,
-        'permission': this.info.permission,
-        'group': this.info.permissionGroup
+        'permissionName': items.name.model,
+        'permission': items.permission.model,
+        'group': items.permissionGroup.model
       })
 
       if (result) {
         this.$message.success('新增权限成功！')
         this.createModalVisible = false
-        this.info = {
-          id: 0,
-          name: '',
-          permission: '',
-          permissionGroup: '' }
+        this.initInfo()
         this.fetch({
           ...this.tablePagination
         })
       }
     },
-    async editModalAction () {
-      if (this.info.name === '') {
-        this.$message.error('请填写权限名称！')
-        return
-      }
-
-      if (this.info.permission === '') {
-        this.$message.error('请填写权限值！')
-        return
-      }
-
-      if (this.info.permissionGroup === '') {
-        this.$message.error('请填写权限组！')
-        return
-      }
-
+    async editModalAction (items) {
       let result = await api.editPermission({
-        'permissionName': this.info.name,
-        'permission': this.info.permission,
-        'group': this.info.permissionGroup
+        permissionID: items.id.model,
+        permissionName: items.name.model,
+        permission: items.permission.model,
+        group: items.permissionGroup.model
       })
 
       if (result) {
         this.$message.success('权限修改成功！')
         this.editModalVisible = false
-        this.info = {
-          id: 0,
-          name: '',
-          permission: '',
-          permissionGroup: '' }
+        this.initInfo()
         this.fetch({
           ...this.tablePagination
         })

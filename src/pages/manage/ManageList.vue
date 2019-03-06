@@ -2,74 +2,41 @@
   <div>
     <h3>管理员列表</h3>
     <iTable :toolbars="tableToolbars" :actionButtons="tableActionBtns" :columns="tableColumns" :dataSource="tableData" :pagination="tablePagination" :height="tableHeight" @on-change="handleTableChange"></iTable>
-    <a-modal title="新增管理员" v-model="createModalVisible" @ok="createModalAction" okText="保存" cancelText="取消">
-      <a-form>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='登录名'>
-          <a-input placeholder='请输入登录名' v-model="info.loginName"></a-input>
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='登录密码'>
-          <a-input placeholder='请输入登录密码' v-model="info.loginPwd" type="password">
-          </a-input>
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='真实姓名'>
-          <a-input placeholder='请输入真实姓名' v-model="info.fullName">
-          </a-input>
-        </a-form-item>
-      </a-form>
+    <a-modal title="设置角色" v-model="editRoleModalVisible" @ok="editRoleModalAction" okText="保存" cancelText="取消">
+      <a-transfer :dataSource="roles" showSearch :filterOption="filterOption" :targetKeys="managerRoles" @change="handleRoleChange" :render="item=>item.title">
+      </a-transfer>
     </a-modal>
-    <a-modal title="修改管理员密码" v-model="editPwdModalVisible" @ok="editPwdModalAction" okText="保存" cancelText="取消">
-      <a-form>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='登录名'>
-          {{info.loginName}}
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='真实姓名'>
-          {{info.fullName}}
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='原密码'>
-          <a-input placeholder='请输入原密码' v-model="info.oldLoginPwd" type="password"></a-input>
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='新密码'>
-          <a-input placeholder='请输入新密码' v-model="info.newLoginPwd" type="password"></a-input>
-        </a-form-item>
-      </a-form>
-    </a-modal>
+    <iFormBox title="新增管理员" :items="createInfo" :isVisible.sync="createModalVisible" @on-action="createModalAction"></iFormBox>
+    <iFormBox title="修改管理员密码" :items="editPwdInfo" :isVisible.sync="editPwdModalVisible" @on-action="editPwdModalAction"></iFormBox>
   </div>
 </template>
 
 <script>
 
 import api from '../../api/cheetah'
-import { iTable } from '../../components/'
+import { iTable, iFormBox } from '../../components/'
 
 export default {
   components: {
-    iTable
+    iTable,
+    iFormBox
   },
   data () {
     return {
-      labelCol: {
-        span: 4
-      },
-      wrapperCol: {
-        span: 14
-      },
-      wrapperButtonCol: {
-        span: 14, offset: 4
-      },
       tableColumns: [],
       tableData: [],
       tablePagination: {},
       tableToolbars: [],
       tableActionBtns: [],
+      roles: [],
+      managerRoles: [],
       createModalVisible: false,
       editPwdModalVisible: false,
-      info: {
-        id: 0,
-        loginName: '',
-        loginPwd: '',
-        fullName: '',
-        oldLoginPwd: '',
-        newLoginPwd: ''
+      editRoleModalVisible: false,
+      createInfo: {},
+      editPwdInfo: {},
+      editRoleInfo: {
+        id: 0
       }
     }
   },
@@ -105,13 +72,7 @@ export default {
           icon: 'edit',
           text: '新增',
           click: () => {
-            this.info = {
-              id: 0,
-              loginName: '',
-              loginPwd: '',
-              fullName: '',
-              oldLoginPwd: '',
-              newLoginPwd: '' }
+            this.initInfo()
             this.createModalVisible = true
           }
         }
@@ -146,8 +107,19 @@ export default {
           purview: 'edit',
           style: { color: '#ff6900' },
           icon: 'edit',
-          click: (e) => {
-            this.$message.success('此功能还未开放！')
+          click: async (e) => {
+            let result = await api.getManagementRole({
+              adminID: e.id
+            })
+            if (result) {
+              this.managerRoles = result.data.map(m => {
+                return `${m.id}`
+              })
+            } else {
+              this.managerRoles = []
+            }
+            this.editRoleInfo.id = e.id
+            this.editRoleModalVisible = true
           }
         },
         {
@@ -156,10 +128,9 @@ export default {
           icon: 'edit',
           purview: 'edit',
           click: (e) => {
-            this.info = {
-              id: e.id,
-              loginName: e.name,
-              fullName: e.fullName }
+            this.editPwdInfo.id.model = e.id
+            this.editPwdInfo.loginName.model = e.name
+            this.editPwdInfo.fullName.model = e.fullName
             this.editPwdModalVisible = true
           }
         },
@@ -195,10 +166,76 @@ export default {
       this.fetch({
         ...this.tablePagination
       })
+      this.getRoles()
+      this.initInfo()
+    },
+    initInfo () {
+      this.createInfo = {
+        id: {
+          model: 0
+        },
+        loginName: {
+          type: 'text',
+          label: '登录名',
+          placeholder: '请输入登录名',
+          model: ''
+        },
+        loginPwd: {
+          type: 'password',
+          label: '登录密码',
+          placeholder: '请输入登录密码',
+          model: ''
+        },
+        fullName: {
+          type: 'text',
+          label: '真实姓名',
+          placeholder: '请输入真实姓名',
+          model: ''
+        },
+        oldLoginPwd: '',
+        newLoginPwd: ''
+      }
+      this.editPwdInfo = {
+        id: {
+          model: 0
+        },
+        loginName: {
+          type: 'text',
+          label: '登录名',
+          placeholder: '请输入登录名',
+          model: '',
+          readonly: true
+        },
+        fullName: {
+          type: 'text',
+          label: '真实姓名',
+          placeholder: '请输入真实姓名',
+          model: '',
+          readonly: true
+        },
+        oldLoginPwd: {
+          type: 'password',
+          label: '原密码',
+          placeholder: '请输入原密码',
+          model: ''
+        },
+        newLoginPwd: {
+          type: 'password',
+          label: '新密码',
+          placeholder: '请输入新密码',
+          model: ''
+        }
+      }
+      this.editRoleInfo = {
+        id: 0
+      }
     },
     async fetch (param = {}) {
       this.tableData = []
-      let result = await api.getAllManagement(`?pageindex=${param.current}&pagesize=${param.pageSize}`)
+      let result = await api.getAllManagement({
+        pageindex: param.current,
+        pagesize: param.pageSize
+      })
       if (result) {
         result.data.forEach(item => {
           this.tableData.push({
@@ -213,81 +250,79 @@ export default {
         }
       }
     },
+    async getRoles () {
+      let result = await api.getAllRole({
+        pageindex: 1,
+        pagesize: 99999999
+      })
+      if (result) {
+        this.roles = result.data.map(r => {
+          return {
+            key: r.id.toString(),
+            title: r.name,
+            description: r.name
+          }
+        })
+      }
+    },
     handleTableChange (val) {
       this.tablePagination = val.pagination
       this.fetch({
         ...this.tablePagination
       })
     },
-    async createModalAction () {
-      if (this.info.loginName === '') {
-        this.$message.error('请填写帐号信息！')
-        return
-      }
-
-      if (this.info.loginPwd === '') {
-        this.$message.error('请填写密码！')
-        return
-      }
-
-      if (this.info.fullName === '') {
-        this.$message.error('请填写真实姓名！')
-        return
-      }
-
+    filterOption (inputValue, option) {
+      return option.title.indexOf(inputValue) > -1
+    },
+    async createModalAction (items) {
       let result = await api.createManagement({
-        'adminName': this.info.loginName,
-        'password': this.info.loginPwd,
-        'fullName': this.info.fullName
+        'adminName': items.loginName.model,
+        'password': items.loginPwd.model,
+        'fullName': items.fullName.model
       })
 
       if (result) {
         this.$message.success('新增管理员成功！')
         this.createModalVisible = false
-        this.info = {
-          id: 0,
-          loginName: '',
-          loginPwd: '',
-          fullName: '',
-          oldLoginPwd: '',
-          newLoginPwd: '' }
+        this.initInfo()
         this.fetch({
           ...this.tablePagination
         })
       }
     },
-    async editPwdModalAction () {
-      if (this.info.oldLoginPwd === '') {
-        this.$message.error('请填写帐号原密码！')
-        return
-      }
-
-      if (this.info.newLoginPwd === '') {
-        this.$message.error('请填写帐号新密码！')
-        return
-      }
-
+    async editPwdModalAction (items) {
       let result = await api.editManagementPwd(
         {
-          adminID: this.info.id,
-          old: this.info.oldLoginPwd,
-          new: this.info.newLoginPwd
+          adminID: items.id.model,
+          old: items.oldLoginPwd.model,
+          new: items.newLoginPwd.model
         }
       )
 
       if (result) {
         this.$message.success('密码修改成功！')
         this.editPwdModalVisible = false
-        this.info = {
-          id: 0,
-          loginName: '',
-          loginPwd: '',
-          fullName: '',
-          oldLoginPwd: '',
-          newLoginPwd: '' }
+        this.initInfo()
         this.fetch({
           ...this.tablePagination
         })
+      }
+    },
+    handleRoleChange (targetKeys, direction, moveKeys) {
+      this.managerRoles = targetKeys
+    },
+    async editRoleModalAction () {
+      let result = await api.editManagementRole({
+        adminID: this.editRoleInfo.id,
+        roles: this.managerRoles.map(m => {
+          return {
+            roleID: m
+          }
+        })
+      })
+      if (result) {
+        this.editRoleModalVisible = false
+        this.$message.success('管理员角色修改成功，请联系管理员重新登录！')
       }
     }
   }

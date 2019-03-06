@@ -2,36 +2,22 @@
   <div>
     <h3>角色列表</h3>
     <iTable :toolbars="tableToolbars" :actionButtons="tableActionBtns" :columns="tableColumns" :dataSource="tableData" :pagination="tablePagination" :height="tableHeight" @on-change="handleTableChange"></iTable>
-    <a-modal title="新增角色" v-model="createModalVisible" @ok="createModalAction" okText="保存" cancelText="取消">
-      <a-form>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='角色名称'>
-          <a-input placeholder='请输入角色名称' v-model="info.roleName"></a-input>
-        </a-form-item>
-      </a-form>
-    </a-modal>
+    <iFormBox title="新增角色" :items="info" :isVisible.sync="createModalVisible" @on-action="createModalAction"></iFormBox>
   </div>
 </template>
 
 <script>
 
 import api from '../../api/cheetah'
-import { iTable } from '../../components/'
+import { iTable, iFormBox } from '../../components/'
 
 export default {
   components: {
-    iTable
+    iTable,
+    iFormBox
   },
   data () {
     return {
-      labelCol: {
-        span: 4
-      },
-      wrapperCol: {
-        span: 14
-      },
-      wrapperButtonCol: {
-        span: 14, offset: 4
-      },
       tableColumns: [],
       tableData: [],
       tablePagination: {},
@@ -39,10 +25,7 @@ export default {
       tableActionBtns: [],
       createModalVisible: false,
       editPwdModalVisible: false,
-      info: {
-        id: 0,
-        roleName: ''
-      }
+      info: {}
     }
   },
   computed: {
@@ -77,9 +60,7 @@ export default {
           icon: 'edit',
           text: '新增',
           click: () => {
-            this.info = {
-              id: 0,
-              roleName: '' }
+            this.initInfo()
             this.createModalVisible = true
           }
         }
@@ -146,10 +127,27 @@ export default {
       this.fetch({
         ...this.tablePagination
       })
+      this.initInfo()
+    },
+    initInfo () {
+      this.info = {
+        id: {
+          model: 0
+        },
+        roleName: {
+          type: 'input',
+          label: '角色名称',
+          placeholder: '请输入角色名称',
+          model: ''
+        }
+      }
     },
     async fetch (param = {}) {
       this.tableData = []
-      let result = await api.getAllRole(`?pageindex=${param.current}&pagesize=${param.pageSize}`)
+      let result = await api.getAllRole({
+        pageindex: param.current,
+        pagesize: param.pageSize
+      })
       if (result) {
         result.data.forEach(item => {
           this.tableData.push({
@@ -170,22 +168,15 @@ export default {
         ...this.tablePagination
       })
     },
-    async createModalAction () {
-      if (this.info.roleName === '') {
-        this.$message.error('请填写角色名称！')
-        return
-      }
-
+    async createModalAction (items) {
       let result = await api.createRole({
-        'roleName': this.info.roleName
+        'roleName': items.roleName.model
       })
 
       if (result) {
         this.$message.success('新增角色成功！')
         this.createModalVisible = false
-        this.info = {
-          id: 0,
-          roleName: '' }
+        this.initInfo()
         this.fetch({
           ...this.tablePagination
         })
