@@ -22,7 +22,7 @@
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='登录名'>
           {{info.loginName}}
         </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='登录密码'>
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='真实姓名'>
           {{info.fullName}}
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='原密码'>
