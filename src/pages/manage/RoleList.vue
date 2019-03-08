@@ -2,6 +2,17 @@
   <div>
     <h3>角色列表</h3>
     <iTable :toolbars="tableToolbars" :actionButtons="tableActionBtns" :columns="tableColumns" :dataSource="tableData" :pagination="tablePagination" :height="tableHeight" @on-change="handleTableChange"></iTable>
+    <a-modal title="设置权限" width="750px" v-model="editPermissionModalVisible" @ok="editPermissionModalAction" okText="保存" cancelText="取消">
+      <a-form>
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="设置权限">
+          <a-transfer v-if="editPermissionModalVisible" :titles="['未选权限', '已选权限']" :dataSource="permissions" :filterOption="filterOption" :targetKeys="rolePermissions" @change="handlePermissionChange" :render="item=>item.title"></a-transfer>
+        </a-form-item>
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="设置菜单">
+          <a-tree v-if="editPermissionModalVisible" checkable :treeData="menus" :defaultCheckedKeys="roleMenus" @check="handleMenuChange">
+          </a-tree>
+        </a-form-item>
+      </a-form>
+    </a-modal>
     <iFormBox title="新增角色" :items="info" :isVisible.sync="createModalVisible" @on-action="createModalAction"></iFormBox>
   </div>
 </template>
@@ -18,6 +29,12 @@ export default {
   },
   data () {
     return {
+      labelCol: {
+        span: 4
+      },
+      wrapperCol: {
+        span: 14
+      },
       tableColumns: [],
       tableData: [],
       tablePagination: {},
@@ -25,7 +42,15 @@ export default {
       tableActionBtns: [],
       createModalVisible: false,
       editPwdModalVisible: false,
-      info: {}
+      editPermissionModalVisible: false,
+      info: {},
+      permissions: [],
+      rolePermissions: [],
+      editPermissionInfo: {
+        id: 0
+      },
+      menus: [],
+      roleMenus: []
     }
   },
   computed: {
@@ -87,12 +112,51 @@ export default {
       this.tableActionBtns = [
         {
           model: 'button',
-          text: '设置菜单',
+          text: '设置权限',
           purview: 'edit',
-          style: { color: '#ff6900' },
+          style: { color: '#1890ff' },
           icon: 'edit',
-          click: (e) => {
-            this.$message.success('此功能还未开放！')
+          click: async (e) => {
+            let result = await api.getRolePermission({
+              roleID: e.id
+            })
+            if (result && result.data) {
+              this.rolePermissions = result.data.map(m => {
+                return `${m.id}`
+              })
+            } else {
+              this.rolePermissions = []
+            }
+
+            result = await api.getRolePage({
+              roleID: e.id
+            })
+            if (result && result.data) {
+              for (let i = 0, j = result.data.length; i < j; i++) {
+                if ((result.data[i].children && result.data[i].children.length > 0) || result.data[i].permission) {
+                  if (result.data[i].permission) {
+                    this.roleMenus = this.roleMenus.concat(result.data[i].permission.split(',').map(m => {
+                      return `${result.data[i].id}-${m}`
+                    }))
+                  }
+
+                  for (let x = 0, y = result.data[i].children.length; x < y; x++) {
+                    this.roleMenus.push(`${result.data[i].children[x].id}`)
+                    if (result.data[i].children[x].permission) {
+                      this.roleMenus = this.roleMenus.concat(result.data[i].children[x].permission.split(',').map(m => {
+                        return `${result.data[i].children[x].id}-${m}`
+                      }))
+                    }
+                  }
+                } else {
+                  this.roleMenus.push(`${result.data[i].id}`)
+                }
+              }
+            } else {
+              this.roleMenus = []
+            }
+            this.editPermissionModalVisible = true
+            this.editPermissionInfo.id = e.id
           }
         },
         {
@@ -127,6 +191,8 @@ export default {
       this.fetch({
         ...this.tablePagination
       })
+      this.getPermissions()
+      this.getMenus()
       this.initInfo()
     },
     initInfo () {
@@ -135,11 +201,55 @@ export default {
           model: 0
         },
         roleName: {
-          type: 'input',
+          type: 'text',
           label: '角色名称',
           placeholder: '请输入角色名称',
           model: ''
         }
+      }
+    },
+    async getPermissions () {
+      let result = await api.getAllPermission({
+        pageindex: 1,
+        pagesize: 99999999
+      })
+      if (result) {
+        this.permissions = result.data.map(p => {
+          return {
+            key: p.id.toString(),
+            title: p.name,
+            description: p.name
+          }
+        })
+      }
+    },
+    async getMenus () {
+      let result = await api.getAllPage({
+        pageindex: 1,
+        pagesize: 99999999
+      })
+      if (result && result.data) {
+        let levelMenu = function (data, parentId) {
+          let l = []
+          for (let i = 0, j = data.length; i < j; i++) {
+            if (parseInt(parentId) === parseInt(data[i].parentId)) {
+              let buttonPermission = data[i].buttonPermission ? data[i].buttonPermission.split(',').map(b => {
+                return {
+                  title: `功能按钮-${b.split('|')[0]}`,
+                  key: `${data[i].id}-${b.split('|')[1]}`
+                }
+              }) : []
+              l.push({
+                title: data[i].name,
+                key: `${data[i].id}`,
+                children: levelMenu(data, data[i].id).concat(buttonPermission)
+              })
+            }
+          }
+          return l
+        }
+
+        this.menus = levelMenu(result.data, 0)
       }
     },
     async fetch (param = {}) {
@@ -162,6 +272,9 @@ export default {
         }
       }
     },
+    filterOption (inputValue, option) {
+      return option.title.indexOf(inputValue) > -1
+    },
     handleTableChange (val) {
       this.tablePagination = val.pagination
       this.fetch({
@@ -181,6 +294,64 @@ export default {
           ...this.tablePagination
         })
       }
+    },
+    handlePermissionChange (targetKeys, direction, moveKeys) {
+      this.rolePermissions = targetKeys
+    },
+    async editPermissionModalAction () {
+      let $this = this
+      this.$confirm({
+        title: '提示',
+        content: '您正在修改该角色的权限和菜单，确认是否保存？',
+        okText: '保存',
+        cancelText: '取消',
+        async onOk () {
+          let dataRoleMenus = []
+          for (let i = 0, j = $this.roleMenus.length; i < j; i++) {
+            if ($this.roleMenus[i].indexOf('-') === -1) {
+              dataRoleMenus.push({
+                pageID: $this.roleMenus[i],
+                permission: ''
+              })
+            }
+          }
+          for (let i = 0, j = $this.roleMenus.length; i < j; i++) {
+            if ($this.roleMenus[i].indexOf('-') > -1) {
+              let find = dataRoleMenus.find(f => {
+                return parseInt(f.pageID) === parseInt($this.roleMenus[i].split('-')[0])
+              })
+              if (find) {
+                find.permission += find.permission === '' ? `${$this.roleMenus[i].split('-')[1]}` : `,${$this.roleMenus[i].split('-')[1]}`
+              }
+            }
+          }
+
+          let result = await api.editRolePermission({
+            roleID: $this.editPermissionInfo.id,
+            permissions: $this.rolePermissions.map(m => {
+              return {
+                permissionID: m
+              }
+            })
+          })
+          if (result) {
+            result = await api.editRolePage({
+              roleID: $this.editPermissionInfo.id,
+              pages: dataRoleMenus
+            })
+
+            if (result) {
+              $this.editPermissionModalVisible = false
+              $this.$message.success('角色权限菜单修改成功，请联系相关角色管理员重新登录！')
+            }
+          }
+        },
+        onCancel () {
+        }
+      })
+    },
+    handleMenuChange (checkedKeys, info) {
+      this.roleMenus = checkedKeys.concat(info.halfCheckedKeys)
     }
   }
 }

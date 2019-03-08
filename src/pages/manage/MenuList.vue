@@ -86,12 +86,12 @@ export default {
           dataIndex: 'url',
           width: '20%'
         }, {
-          title: '父级页面编号',
+          title: '父级编号',
           dataIndex: 'parentId',
-          width: '20%'
+          width: '15%'
         }, {
-          title: '图标',
-          dataIndex: 'icon',
+          title: '功能按钮',
+          dataIndex: 'buttonPermission',
           width: '20%'
         }, {
           title: '操作',
@@ -113,6 +113,7 @@ export default {
             this.editInfo.url.model = e.url
             this.editInfo.parentID.model = e.parentId
             this.editInfo.icon.model = e.icon
+            this.editInfo.buttonPermission.model = e.buttonPermission
             this.editModalVisible = true
           }
         },
@@ -201,6 +202,13 @@ export default {
           model: '',
           optionIconData: icons,
           isNull: true
+        },
+        buttonPermission: {
+          type: 'text',
+          label: '功能按钮',
+          placeholder: '请输入功能按钮',
+          model: '',
+          isNull: true
         }
       }
       this.editInfo = {
@@ -233,6 +241,13 @@ export default {
           placeholder: '请选择图标',
           model: '',
           optionIconData: icons,
+          isNull: true
+        },
+        buttonPermission: {
+          type: 'text',
+          label: '功能按钮',
+          placeholder: '请输入功能按钮',
+          model: '',
           isNull: true
         }
       }
@@ -268,7 +283,8 @@ export default {
         pageName: items.pageName.model,
         url: items.url.model,
         parentID: items.parentID.model,
-        icon: items.icon.model
+        icon: items.icon.model,
+        buttonPermission: items.buttonPermission.model
       })
 
       if (result) {
@@ -285,7 +301,8 @@ export default {
         pageID: items.id.model,
         url: items.url.model,
         parentID: items.parentID.model,
-        icon: items.icon.model
+        icon: items.icon.model,
+        buttonPermission: items.buttonPermission.model
       })
 
       if (result) {

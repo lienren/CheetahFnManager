@@ -6,7 +6,7 @@
           <a-form-item v-if="items[item].type" :key="item" :labelCol="labelCol" :wrapperCol="wrapperCol" :label="items[item].label">
             <template v-if="!items[item].readonly">
               <a-input v-if="items[item].type==='text'||items[item].type==='password'" :placeholder="items[item].placeholder" v-model="items[item].model" :type="items[item].type"></a-input>
-              <a-select v-else style="width: 120px" @change="handleSelectChange">
+              <a-select v-else style="width: 120px" @change="handleSelectChange" :defaultValue="`${item},${items[item].model}`">
                 <a-select-option v-if="items[item].optionData" v-for="(option, index) in items[item].optionData" :key="index" :value="`${item},${option.val}`">{{option.text}}</a-select-option>
                 <a-select-option v-if="items[item].optionIconData" :value="`${item},`">无</a-select-option>
                 <a-select-option v-if="items[item].optionIconData" v-for="(option, index) in items[item].optionIconData" :key="index" :value="`${item},${option.val}`"><a-icon :type="option.val" />&nbsp;{{option.val}}</a-select-option>

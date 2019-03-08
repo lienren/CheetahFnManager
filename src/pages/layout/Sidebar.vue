@@ -4,7 +4,7 @@
       <span>{{version}}</span>
       <div :class="navSwitchClassName" :title="navSwitchText" @click="collapse"></div>
     </div>
-    <a-menu theme="dark" mode="inline" :openKeys="openKeys" @openChange="onOpenChange" :defaultOpenKeys="defaultOpenKeys" :defaultSelectedKeys="defaultSelectedKeys" @select="select">
+    <a-menu theme="dark" mode="inline" :openKeys.sync="openKeys" @openChange="onOpenChange" :defaultSelectedKeys="defaultSelectedKeys" @select="select">
       <template v-for="nav in navs">
         <a-sub-menu v-if="nav.children&&nav.children.length>0" :key="nav.id">
           <span slot="title">
@@ -58,18 +58,6 @@ export default {
       let path = window.location.href.split('/')
       return path && path.length > 0 ? `/${path[path.length - 1]}` : ''
     },
-    defaultOpenKeys () {
-      let rountKey = this.rountKey
-      let openKeys = ''
-      this.navs.forEach((nav) => {
-        if (nav.children && nav.children.length > 0) {
-          openKeys = nav.children.some((child) => {
-            return child.id === rountKey
-          }) ? nav.id : ''
-        }
-      })
-      return openKeys === '' ? [] : [openKeys]
-    },
     defaultSelectedKeys () {
       return this.rountKey === '' ? [] : [this.rountKey]
     },
@@ -89,10 +77,20 @@ export default {
   },
   methods: {
     init () {
-      this.$emit('on-init', {
-        defaultOpenKeys: this.defaultOpenKeys,
-        defaultSelectedKeys: this.defaultSelectedKeys
+      this.$emit('on-init', this.defaultSelectedKeys)
+      this.defaultOpenKeys()
+    },
+    defaultOpenKeys () {
+      let rountKey = this.rountKey
+      let openKeys = ''
+      this.navs.forEach((nav) => {
+        if (nav.children && nav.children.length > 0) {
+          openKeys = nav.children.some((child) => {
+            return child.id === rountKey
+          }) ? nav.id : ''
+        }
       })
+      this.openKeys = openKeys === '' ? [] : [openKeys]
     },
     collapse () {
       // 设置登录信息

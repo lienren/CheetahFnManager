@@ -12,6 +12,8 @@
           <a-avatar icon="user" size="small" style="color: #fff; backgroundColor: #1890ff; cursor: pointer;"></a-avatar>
         </a-badge>
         <a-menu slot="overlay" @click="clickDropDown">
+          <a-menu-item key="clickAuthInfo">您好，{{authInfo.fullName}}</a-menu-item>
+          <a-menu-divider />
           <a-menu-item v-for="item in dropDownList" :key="item.key">{{item.name}}</a-menu-item>
         </a-menu>
       </a-dropdown>
@@ -20,6 +22,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 
 export default {
   props: {
@@ -41,7 +44,11 @@ export default {
   data () {
     return {}
   },
-  computed: { },
+  computed: {
+    ...mapState({
+      authInfo: state => state.auth.authInfo
+    })
+  },
   created () { },
   beforeDestroy () { },
   mounted () { },

@@ -174,7 +174,8 @@ export default {
           type: 'text',
           label: '权限名称',
           placeholder: '请输入权限名称',
-          model: ''
+          model: '',
+          readonly: true
         },
         permission: {
           type: 'text',

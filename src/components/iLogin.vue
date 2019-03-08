@@ -105,8 +105,7 @@ export default {
         let tokenInfo = this.$utils.Jwt.getTokenInfo(result.data)
         window.$globalHub.$store.commit('SET_AUTH', {
           loginName: this.loginName,
-          // TODO: 需要更新成fullName数据
-          fullName: tokenInfo && tokenInfo.payload ? tokenInfo.payload.username : '未知',
+          fullName: tokenInfo && tokenInfo.payload ? tokenInfo.payload.fullname : '未知',
           token: result.data,
           tokenInfo: tokenInfo
         })

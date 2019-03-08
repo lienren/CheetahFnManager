@@ -40,7 +40,7 @@ export default {
         key: 'editPwd',
         name: '修改密码',
         click: (e) => {
-          this.$message.success('点击修改密码!')
+          this.$router.push({ path: '/editpwd' })
         }
       }, {
         key: 'quit',
@@ -58,7 +58,7 @@ export default {
               $this.$router.push({ path: '/login' })
             },
             onCancel () {
-              console.log('cancel!')
+              // console.log('cancel!')
             }
           })
         }
@@ -85,9 +85,9 @@ export default {
     }
   },
   methods: {
-    menuInit (data) {
+    menuInit (defaultSelectedKeys) {
       // 设置面包屑名称
-      this.setCrumbs(data.defaultSelectedKeys && data.defaultSelectedKeys.length > 0 ? data.defaultSelectedKeys[0] : '')
+      this.setCrumbs(defaultSelectedKeys && defaultSelectedKeys.length > 0 ? defaultSelectedKeys[0] : '')
     },
     menuCollapse (collapsed) {
       if (collapsed) {
@@ -130,7 +130,7 @@ export default {
       }
     },
     clickDropDown (e) {
-      console.log('clickDropDown:', e)
+      // console.log('clickDropDown:', e)
     }
   }
 }

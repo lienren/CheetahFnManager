@@ -2,7 +2,7 @@
  * @Author: Lienren
  * @Date: 2019-03-05 10:48:19
  * @Last Modified by: Lienren
- * @Last Modified time: 2019-03-06 18:04:25
+ * @Last Modified time: 2019-03-08 10:22:07
  */
 'use strict'
 
@@ -43,6 +43,18 @@ export default {
   },
   createRole (body, op = {}) {
     return Vue.$utils.Http.post(`/cheetah/management/role/add`, { ...body }, op)
+  },
+  getRolePermission (body, op = {}) {
+    return Vue.$utils.Http.post(`/cheetah/management/role/getRolePermissions`, { ...body }, op)
+  },
+  editRolePermission (body, op = {}) {
+    return Vue.$utils.Http.post(`/cheetah/management/role/updatePermissons`, { ...body }, op)
+  },
+  getRolePage (body, op = {}) {
+    return Vue.$utils.Http.post(`/cheetah/management/role/getMenuList`, { ...body }, op)
+  },
+  editRolePage (body, op = {}) {
+    return Vue.$utils.Http.post(`/cheetah/management/role/updatePages`, { ...body }, op)
   },
   getAllPermission (body, op = {}) {
     return Vue.$utils.Http.post(`/cheetah/management/permission/getAll`, {...body}, op)

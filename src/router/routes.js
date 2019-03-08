@@ -2,7 +2,7 @@
  * @Author: Lienren
  * @Date: 2018-08-19 10:08:52
  * @Last Modified by: Lienren
- * @Last Modified time: 2019-03-05 17:51:31
+ * @Last Modified time: 2019-03-08 10:39:46
  */
 'use strict'
 
@@ -63,6 +63,11 @@ export default [
         path: '/logs',
         name: '日志查看',
         component: view('manage/Logs')
+      },
+      {
+        path: '/editpwd',
+        name: '修改密码',
+        component: view('manage/EditPwd')
       }
     ]
   }

@@ -3,7 +3,7 @@
     <h3>管理员列表</h3>
     <iTable :toolbars="tableToolbars" :actionButtons="tableActionBtns" :columns="tableColumns" :dataSource="tableData" :pagination="tablePagination" :height="tableHeight" @on-change="handleTableChange"></iTable>
     <a-modal title="设置角色" v-model="editRoleModalVisible" @ok="editRoleModalAction" okText="保存" cancelText="取消">
-      <a-transfer :dataSource="roles" showSearch :filterOption="filterOption" :targetKeys="managerRoles" @change="handleRoleChange" :render="item=>item.title">
+      <a-transfer v-if="editRoleModalVisible" :titles="['未选角色', '已选角色']" :dataSource="roles" :filterOption="filterOption" :targetKeys="managerRoles" @change="handleRoleChange" :render="item=>item.title">
       </a-transfer>
     </a-modal>
     <iFormBox title="新增管理员" :items="createInfo" :isVisible.sync="createModalVisible" @on-action="createModalAction"></iFormBox>
@@ -105,13 +105,13 @@ export default {
           model: 'button',
           text: '设置角色',
           purview: 'edit',
-          style: { color: '#ff6900' },
+          style: { color: '#1890ff' },
           icon: 'edit',
           click: async (e) => {
             let result = await api.getManagementRole({
               adminID: e.id
             })
-            if (result) {
+            if (result && result.data) {
               this.managerRoles = result.data.map(m => {
                 return `${m.id}`
               })
@@ -312,18 +312,29 @@ export default {
       this.managerRoles = targetKeys
     },
     async editRoleModalAction () {
-      let result = await api.editManagementRole({
-        adminID: this.editRoleInfo.id,
-        roles: this.managerRoles.map(m => {
-          return {
-            roleID: m
+      let $this = this
+      this.$confirm({
+        title: '提示',
+        content: '您正在修改该管理员的角色，确认是否保存？',
+        okText: '保存',
+        cancelText: '取消',
+        async onOk () {
+          let result = await api.editManagementRole({
+            adminID: $this.editRoleInfo.id,
+            roles: $this.managerRoles.map(m => {
+              return {
+                roleID: m
+              }
+            })
+          })
+          if (result) {
+            $this.editRoleModalVisible = false
+            $this.$message.success('管理员角色修改成功，请联系管理员重新登录！')
           }
-        })
+        },
+        onCancel () {
+        }
       })
-      if (result) {
-        this.editRoleModalVisible = false
-        this.$message.success('管理员角色修改成功，请联系管理员重新登录！')
-      }
     }
   }
 }
