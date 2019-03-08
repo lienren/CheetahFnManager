@@ -84,6 +84,7 @@ export default {
           model: 'button',
           icon: 'edit',
           text: '新增',
+          purview: 'create',
           click: () => {
             this.initInfo()
             this.createModalVisible = true
@@ -113,7 +114,7 @@ export default {
         {
           model: 'button',
           text: '设置权限',
-          purview: 'edit',
+          purview: 'editpermission',
           style: { color: '#1890ff' },
           icon: 'edit',
           click: async (e) => {

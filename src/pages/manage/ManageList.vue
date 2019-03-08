@@ -71,6 +71,7 @@ export default {
           model: 'button',
           icon: 'edit',
           text: '新增',
+          purview: 'create',
           click: () => {
             this.initInfo()
             this.createModalVisible = true
@@ -104,7 +105,7 @@ export default {
         {
           model: 'button',
           text: '设置角色',
-          purview: 'edit',
+          purview: 'editrole',
           style: { color: '#1890ff' },
           icon: 'edit',
           click: async (e) => {
@@ -126,7 +127,7 @@ export default {
           model: 'button',
           text: '修改密码',
           icon: 'edit',
-          purview: 'edit',
+          purview: 'editpwd',
           click: (e) => {
             this.editPwdInfo.id.model = e.id
             this.editPwdInfo.loginName.model = e.name

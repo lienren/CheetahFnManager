@@ -64,6 +64,7 @@ export default {
           model: 'button',
           icon: 'edit',
           text: '新增',
+          purview: 'create',
           click: () => {
             this.initInfo()
             this.createModalVisible = true

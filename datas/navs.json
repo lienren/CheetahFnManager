@@ -12,19 +12,22 @@
       {
         "id": "/managelist",
         "name": "管理员管理",
-        "purview": ["edit", "delete"]
+        "purview": ["create", "editpwd", "editrole", "edit", "delete"]
       },
       {
         "id": "/rolelist",
-        "name": "角色管理"
+        "name": "角色管理",
+        "purview": ["create", "editpermission", "delete"]
       },
       {
         "id": "/permissionlist",
-        "name": "权限接口管理"
+        "name": "权限接口管理",
+        "purview": ["create", "edit", "delete"]
       },
       {
         "id": "/menulist",
-        "name": "菜单管理"
+        "name": "菜单管理",
+        "purview": ["create", "edit", "delete"]
       },
       {
         "id": "/logs",
