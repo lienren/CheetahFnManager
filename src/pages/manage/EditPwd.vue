@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import api from '../../api/cheetah'
+import { mapState } from 'vuex'
 
 export default {
   components: { },
@@ -47,7 +49,11 @@ export default {
       newPwd2: ''
     }
   },
-  computed: { },
+  computed: {
+    ...mapState({
+      authInfo: state => state.auth.authInfo
+    })
+  },
   created () { },
   beforeDestroy () { },
   mounted () {
@@ -75,13 +81,26 @@ export default {
         this.$message.error(`两次密码输入不一致！`)
         return
       }
-      // let $this = this
+      let $this = this
       this.$confirm({
         title: '提示',
         content: '您确认要修改密码码？',
         okText: '确认修改',
         cancelText: '取消',
-        onOk () {},
+        async onOk  () {
+          let result = await api.editManagementPwd(
+            {
+              adminName: $this.authInfo.loginName,
+              old: $this.oldPwd,
+              new: $this.newPwd1
+            }
+          )
+
+          if (result) {
+            $this.$message.success('密码修改成功！')
+            $this.clearAdminPwd()
+          }
+        },
         onCancel () {}
       })
     }

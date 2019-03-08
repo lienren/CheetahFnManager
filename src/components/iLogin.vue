@@ -40,7 +40,7 @@
 
 <script>
 import api from '../api/cheetah'
-const dataNavs = require('../../datas/navs.json')
+// const dataNavs = require('../../datas/navs.json')
 
 export default {
   components: {},
@@ -111,7 +111,30 @@ export default {
         })
 
         // 获取菜单列表
-        window.$globalHub.$store.commit('SET_NAV', dataNavs)
+        result = await api.getManagementPage({
+          adminName: this.loginName
+        })
+        if (result && result.data) {
+          let pageDataToNavs = function (data) {
+            return data.map(m1 => {
+              return {
+                id: m1.url,
+                name: m1.name,
+                icon: m1.icon,
+                children: m1.children && m1.children.length > 0 ? m1.children.map(m2 => {
+                  return {
+                    id: m2.url,
+                    name: m2.name,
+                    purview: m2.permission ? m2.permission.split(',') : []
+                  }
+                }) : null
+              }
+            })
+          }
+          // console.log('pageDataToNavs:', pageDataToNavs)
+          // window.$globalHub.$store.commit('SET_NAV', dataNavs)
+          window.$globalHub.$store.commit('SET_NAV', pageDataToNavs(result.data))
+        }
         this.$router.push({ path: '/dashboard' })
       } else {
         this.loginButtonLoading = false

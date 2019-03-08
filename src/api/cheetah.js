@@ -2,7 +2,7 @@
  * @Author: Lienren
  * @Date: 2019-03-05 10:48:19
  * @Last Modified by: Lienren
- * @Last Modified time: 2019-03-08 10:22:07
+ * @Last Modified time: 2019-03-08 15:05:54
  */
 'use strict'
 
@@ -34,6 +34,9 @@ export default {
   },
   getManagementRole (body, op = {}) {
     return Vue.$utils.Http.post(`/cheetah/management/admin/getAdminRoles`, { ...body }, op)
+  },
+  getManagementPage (body, op = {}) {
+    return Vue.$utils.Http.post(`/cheetah/management/admin/getMenuList`, { ...body }, op)
   },
   getAllRole (body, op = {}) {
     return Vue.$utils.Http.post(`/cheetah/management/role/getAll`, {...body}, op)

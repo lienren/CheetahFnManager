@@ -118,6 +118,8 @@ export default {
           style: { color: '#1890ff' },
           icon: 'edit',
           click: async (e) => {
+            this.rolePermissions = []
+            this.roleMenus = []
             let result = await api.getRolePermission({
               roleID: e.id
             })
@@ -142,11 +144,12 @@ export default {
                   }
 
                   for (let x = 0, y = result.data[i].children.length; x < y; x++) {
-                    this.roleMenus.push(`${result.data[i].children[x].id}`)
                     if (result.data[i].children[x].permission) {
                       this.roleMenus = this.roleMenus.concat(result.data[i].children[x].permission.split(',').map(m => {
                         return `${result.data[i].children[x].id}-${m}`
                       }))
+                    } else {
+                      this.roleMenus.push(`${result.data[i].children[x].id}`)
                     }
                   }
                 } else {
