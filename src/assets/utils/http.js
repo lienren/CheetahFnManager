@@ -2,12 +2,13 @@
  * @Author: Lienren
  * @Date: 2018-08-13 22:29:08
  * @Last Modified by: Lienren
- * @Last Modified time: 2019-03-05 11:25:43
+ * @Last Modified time: 2019-03-11 15:20:45
  */
 'use strict'
 
 import axios from 'axios'
 import ex from './httpex'
+import comm from './common'
 import codes from './httpresultcode'
 
 // 通用接口业务成功判定条件
@@ -30,8 +31,10 @@ function send (url, method, body, options, load, loadMsg, validator, defFail, de
   opts.headers = {
     Accept: 'application/json',
     'Content-Type': 'application/json',
-    Authentication: token || '',
     ...opts.headers
+  }
+  if (token) {
+    opts.headers.Authorization = token
   }
   return axios({ method, url, data: body, ...opts })
     .then(async res => {

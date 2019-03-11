@@ -61,7 +61,7 @@ export default {
   beforeDestroy () { },
   mounted () {
     // 初始化登录信息
-    // this.$store.commit('AUTH_INIT')
+    this.$store.commit('AUTH_INIT')
     this.init()
   },
   methods: {

@@ -120,6 +120,7 @@ export default {
     overflow: hidden;
     span {
       position: absolute;
+      width: 46px;
       left: 50%;
       top: 50%;
       display: inline-block;
@@ -128,7 +129,7 @@ export default {
       border-radius: 20px;
       background: #f56c6c;
       color: #fff;
-      margin: 0 0 0 -16px;
+      margin-left: -23px;
       transform: scale(0.7);
     }
     .collapsed {

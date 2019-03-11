@@ -20,9 +20,9 @@ export default {
   name: 'layout',
   data () {
     return {
-      logoName: '猎豹',
+      logoName: '猎豹 SPM',
       shortLogoName: '猎豹',
-      version: 'V1.0',
+      version: 'V1.0.9',
       crumbs: [],
       badgeNumber: 0,
       cardIsShow: false,

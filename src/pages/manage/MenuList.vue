@@ -115,6 +115,7 @@ export default {
             this.editInfo.parentID.model = e.parentId
             this.editInfo.icon.model = e.icon
             this.editInfo.buttonPermission.model = e.buttonPermission
+            this.editInfo.position.model = e.position
             this.editModalVisible = true
           }
         },
@@ -210,6 +211,13 @@ export default {
           placeholder: '请输入功能按钮',
           model: '',
           isNull: true
+        },
+        position: {
+          type: 'text',
+          label: '菜单排序',
+          placeholder: '请输入菜单排序（数字）',
+          model: '',
+          isNull: true
         }
       }
       this.editInfo = {
@@ -250,6 +258,13 @@ export default {
           placeholder: '请输入功能按钮',
           model: '',
           isNull: true
+        },
+        position: {
+          type: 'text',
+          label: '菜单排序',
+          placeholder: '请输入菜单排序（数字）',
+          model: '',
+          isNull: true
         }
       }
     },
@@ -285,7 +300,8 @@ export default {
         url: items.url.model,
         parentID: items.parentID.model,
         icon: items.icon.model,
-        buttonPermission: items.buttonPermission.model
+        buttonPermission: items.buttonPermission.model,
+        position: items.position.model
       })
 
       if (result) {
@@ -303,7 +319,8 @@ export default {
         url: items.url.model,
         parentID: items.parentID.model,
         icon: items.icon.model,
-        buttonPermission: items.buttonPermission.model
+        buttonPermission: items.buttonPermission.model,
+        position: items.position.model
       })
 
       if (result) {
