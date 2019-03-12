@@ -2,7 +2,7 @@
   <div>
     <h3>日志列表</h3>
     <iTable :toolbars="tableToolbars" :actionButtons="tableActionBtns" :columns="tableColumns" :dataSource="tableData" :pagination="tablePagination" :height="tableHeight" @on-change="handleTableChange"></iTable>
-    <a-drawer title="搜索条件" placement="top" :height="510" :closable="false" @close="onSearchClose" :visible="visibleSearch">
+    <a-drawer title="搜索条件" placement="top" :height="560" :closable="false" @close="onSearchClose" :visible="visibleSearch">
       <a-form>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="开始结束时间">
           <a-range-picker :placeholder="['开始日期', '结束日期']" @change="onChangeStartEndTime" />
@@ -21,6 +21,9 @@
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="接口路径">
           <a-input placeholder="请输入接口路径（选填）" v-model="searchPath"></a-input>
+        </a-form-item>
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="排序">
+          <a-switch v-model="searchSort" checkedChildren="倒序" unCheckedChildren="正序" defaultChecked/>
         </a-form-item>
       </a-form>
       <div :style="{
@@ -109,9 +112,9 @@ export default {
       searchAction: '',
       searchIp: '',
       searchPath: '',
-      searchDirType: 'DESC',
       logDetail: {},
-      isLogVisible: false
+      isLogVisible: false,
+      searchSort: true
     }
   },
   computed: {
@@ -201,6 +204,9 @@ export default {
         current: 1,
         total: 0
       }
+      this.fetch({
+        ...this.tablePagination
+      })
     },
     initInfo () {
       this.searchStartEndTime = []
@@ -212,22 +218,19 @@ export default {
       this.searchPath = ''
     },
     async fetch (param = {}) {
-      if (this.searchStartEndTimeString.length === 0) {
-        return
-      }
       this.tableData = []
       let result = await api.getLogs({
         pageIndex: param.current,
         pageSize: param.pageSize,
-        dirType: this.searchDirType,
+        dirType: this.searchSort ? 'DESC' : 'ASC',
         data: {
           title: this.searchTitle,
           user: this.searchUser,
           action: this.searchAction,
           ip: this.searchIp,
           path: this.searchPath,
-          starttime: this.searchStartEndTimeString[0] + ' 00:00:00',
-          endtime: this.searchStartEndTimeString[1] + ' 23:59:59'
+          starttime: this.searchStartEndTimeString.length > 1 ? this.searchStartEndTimeString[0] + ' 00:00:00' : '',
+          endtime: this.searchStartEndTimeString.length > 1 ? this.searchStartEndTimeString[1] + ' 23:59:59' : ''
         } })
       if (result) {
         result.data.data.forEach(item => {
@@ -259,10 +262,6 @@ export default {
       this.searchStartEndTimeString = dateString
     },
     onSearch () {
-      if (this.searchStartEndTimeString.length === 0) {
-        this.$message.error(`请选择开始结束时间！`)
-        return
-      }
       this.onSearchClose()
       // 分页
       this.tablePagination = {

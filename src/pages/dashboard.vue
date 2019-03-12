@@ -35,13 +35,7 @@ export default {
     })
   },
   methods: {
-    init () {
-      this.$loading.show({ text: '加载中' })
-
-      setTimeout(() => {
-        this.$loading.hide()
-      }, 500)
-    },
+    init () { },
     addBadge () {
       this.$store.commit('SET_BADGE', this.$store.state.auth.badge + 1)
     },

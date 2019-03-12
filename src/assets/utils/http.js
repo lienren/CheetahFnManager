@@ -2,7 +2,7 @@
  * @Author: Lienren
  * @Date: 2018-08-13 22:29:08
  * @Last Modified by: Lienren
- * @Last Modified time: 2019-03-11 15:20:45
+ * @Last Modified time: 2019-03-11 22:29:36
  */
 'use strict'
 
@@ -26,6 +26,7 @@ function send (url, method, body, options, load, loadMsg, validator, defFail, de
   url = requestUrl(url)
   if (load) {
     // 显示加载框
+    window.$globalHub.$loading.show({ text: '加载中' })
   }
   let token = window.$globalHub.$store.state.auth.authInfo.token
   opts.headers = {
@@ -42,6 +43,7 @@ function send (url, method, body, options, load, loadMsg, validator, defFail, de
 
       if (load) {
         // 隐藏加载框
+        window.$globalHub.$loading.hide()
       }
       // 验证接口结果
       if (validator(obj)) {

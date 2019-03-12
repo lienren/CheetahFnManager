@@ -194,7 +194,7 @@ export default {
           type: 'select',
           label: '父级菜单',
           placeholder: '请输入父级菜单',
-          model: '',
+          model: '0',
           optionData: parentMenuList
         },
         icon: {
@@ -241,7 +241,7 @@ export default {
           type: 'select',
           label: '父级菜单',
           placeholder: '请输入父级菜单',
-          model: '',
+          model: '0',
           optionData: parentMenuList
         },
         icon: {
