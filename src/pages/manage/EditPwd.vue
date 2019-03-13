@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="page-main">
     <h3>修改密码</h3>
     <a-form>
       <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label='原密码'>
@@ -107,3 +107,11 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  .page-main {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 2px;
+  }
+</style>

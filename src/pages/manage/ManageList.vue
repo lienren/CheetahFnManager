@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="page-main">
     <h3>管理员列表</h3>
     <iTable :toolbars="tableToolbars" :actionButtons="tableActionBtns" :columns="tableColumns" :dataSource="tableData" :pagination="tablePagination" :height="tableHeight" @on-change="handleTableChange"></iTable>
     <a-modal title="设置角色" v-model="editRoleModalVisible" @ok="editRoleModalAction" okText="保存" cancelText="取消">
@@ -340,3 +340,11 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  .page-main {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 2px;
+  }
+</style>

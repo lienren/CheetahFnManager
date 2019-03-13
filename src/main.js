@@ -2,11 +2,12 @@
  * @Author: Lienren
  * @Date: 2018-08-13 22:29:12
  * @Last Modified by: Lienren
- * @Last Modified time: 2019-02-28 15:26:37
+ * @Last Modified time: 2019-03-13 10:09:04
  */
 'use strict'
 
 import Vue from 'vue'
+import VCharts from 'v-charts'
 import Antd from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.css'
 import VueParticles from 'vue-particles'
@@ -24,6 +25,7 @@ Vue.config.productionTip = false
 Vue.use(Antd)
 Vue.use(UtilsPlugin)
 Vue.use(VueParticles)
+Vue.use(VCharts)
 
 sync(store, router)
 

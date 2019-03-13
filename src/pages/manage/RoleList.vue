@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="page-main">
     <h3>角色列表</h3>
     <iTable :toolbars="tableToolbars" :actionButtons="tableActionBtns" :columns="tableColumns" :dataSource="tableData" :pagination="tablePagination" :height="tableHeight" @on-change="handleTableChange"></iTable>
     <a-modal title="设置权限" width="750px" v-model="editPermissionModalVisible" @ok="editPermissionModalAction" okText="保存" cancelText="取消">
@@ -360,3 +360,11 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  .page-main {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 2px;
+  }
+</style>

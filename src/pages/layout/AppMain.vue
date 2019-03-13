@@ -25,9 +25,9 @@ export default {
 
 <style scoped>
   .app-main {
-    padding: 20px;
+    padding: 0;
     transition: margin-left 0.28s;
-    background: none repeat scroll 0 0 #fff;
+    background: none repeat scroll 0 0;
     width: 100%;
     height: 100%;
     overflow-y: auto;

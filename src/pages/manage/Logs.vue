@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="page-main">
     <h3>日志列表</h3>
     <iTable :toolbars="tableToolbars" :actionButtons="tableActionBtns" :columns="tableColumns" :dataSource="tableData" :pagination="tablePagination" :height="tableHeight" @on-change="handleTableChange"></iTable>
     <a-drawer title="搜索条件" placement="top" :height="560" :closable="false" @close="onSearchClose" :visible="visibleSearch">
@@ -276,3 +276,11 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  .page-main {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 2px;
+  }
+</style>

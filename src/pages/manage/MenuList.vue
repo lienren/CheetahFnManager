@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="page-main">
     <h3>菜单列表</h3>
     <iTable :toolbars="tableToolbars" :actionButtons="tableActionBtns" :columns="tableColumns" :dataSource="tableData" :pagination="tablePagination" :height="tableHeight" @on-change="handleTableChange"></iTable>
     <iFormBox title="新增菜单" :items="createInfo" :isVisible.sync="createModalVisible" @on-action="createModalAction"></iFormBox>
@@ -335,3 +335,11 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  .page-main {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 2px;
+  }
+</style>
