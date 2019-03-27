@@ -2,7 +2,7 @@
  * @Author: Lienren
  * @Date: 2018-08-13 22:29:08
  * @Last Modified by: Lienren
- * @Last Modified time: 2019-03-11 22:29:36
+ * @Last Modified time: 2019-03-27 15:17:37
  */
 'use strict'
 
@@ -32,6 +32,8 @@ function send (url, method, body, options, load, loadMsg, validator, defFail, de
   opts.headers = {
     Accept: 'application/json',
     'Content-Type': 'application/json',
+    TraceId: comm.generateMixed(32),
+    MFId: comm.generateMixed(32),
     ...opts.headers
   }
   if (token) {
